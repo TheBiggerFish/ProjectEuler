@@ -17,4 +17,4 @@ def triplet(sum_):
                     return (i,j,k)
 
 
-print(math.prod(triplet(100)))
+print(math.prod(triplet(1000)))
