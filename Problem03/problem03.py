@@ -12,18 +12,13 @@ def is_prime(number):
         return False
     if (number <= 3) : 
         return True
-  
-    # This is checked so that we can skip  
-    # middle five numbers in below loop 
     if (number % 2 == 0 or number % 3 == 0) : 
         return False
-  
     i = 5
     while(i * i <= number) : 
         if (number % i == 0 or number % (i + 2) == 0) : 
             return False
         i = i + 6
-  
     return True
 
 # Recursive function that returns a list of prime factors
@@ -31,7 +26,7 @@ def prime_factors(number):
     if is_prime(number):
         return [number]
     for i in range(2,number):
-        if number % i == 0 and is_prime(i):
-            return [i] + prime_factors(int(number/i))
+        if number % i == 0:
+            return prime_factors(i) + prime_factors(int(number/i))
 
 print(prime_factors(600851475143)[-1])
