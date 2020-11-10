@@ -13,9 +13,7 @@ def is_prime(n):
         return True
     if n % 2 == 0 or n <= 1:
         return False
-
     sqr = int(n**0.5) + 1
-
     for divisor in range(3, sqr, 2):
         if n % divisor == 0:
             return False
@@ -25,8 +23,8 @@ def prime_factors(number):
     if is_prime(number):
         return [number]
     for i in range(2,number):
-        if number % i == 0 and is_prime(i):
-            return [i] + prime_factors(int(number/i))
+        if number % i == 0:
+            return prime_factors(i) + prime_factors(int(number/i))
 
 def smallest_multiple(upper):
     bag = Multiset([1])
