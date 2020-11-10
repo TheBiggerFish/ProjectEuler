@@ -19,10 +19,10 @@ def is_prime(n):
     return True
 
 def find_prime(which):
-    i = 1
-    cur = 0
+    i = 3
+    cur = 2
     while cur < which:
-        i += 1
+        i += 2
         if is_prime(i):
             cur += 1
     return i
