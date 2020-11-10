@@ -27,12 +27,11 @@ def sequence(value):
     return steps
 
 def longest_collatz(max_start):
-    max_value = 1
+    max_ = 1
     for i in range(max_start):
-        steps = sequence(i)
-        stored[i] = steps
-        if steps > stored[max_value]:
-            max_value = i
-    return max_value
+        stored[i] = sequence(i)
+        if stored[i] > stored[max_]:
+            max_ = i
+    return max_
         
 print(longest_collatz(1000000))
