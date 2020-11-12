@@ -19,8 +19,6 @@ def get_pans():
     all_pans = set()
     for i in range(0,10):
         for j in range(1000,10000):
-            if i * j >= 100000:
-                break
             if is_pan(str(i)+str(j)+str(i*j)):
                 all_pans.add(i*j)
     for i in range(10,100):
