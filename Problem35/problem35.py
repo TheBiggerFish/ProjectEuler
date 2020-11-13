@@ -37,7 +37,7 @@ def all_prime(numbers):
 def circular_primes(max_):
     circ = {2}
     for i in range(3,max_):
-        if '2' in str(i) or i in circ:
+        if len([x for x in str(i) if x in '02468']) > 0:
             continue
         rots = gen_rotations(i)
         if all_prime(rots):
