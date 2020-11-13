@@ -10,16 +10,18 @@ def is_pan(str_):
             return False
     return True
 
+def find_max_pan():
+    max_ = 0
+    for i in range(9,10000):
+        number = ''
+        for j in range(1,9):
+            number += str(i*j)
+            if len(number) > 9:
+                break
+            if len(number) == 9:
+                if is_pan(number):
+                    if int(number) > max_:
+                        max_ = int(number)
+    return max_
 
-max_ = 0
-for i in range(9,10000):
-    number = ''
-    for j in range(1,9):
-        number += str(i*j)
-        if len(number) > 9:
-            break
-        if len(number) == 9:
-            if is_pan(number):
-                if int(number) > max_:
-                    max_ = int(number)
-print(max_)
+print(find_max_pan())
