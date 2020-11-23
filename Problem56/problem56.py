@@ -1,5 +1,5 @@
 # Written by Cameron Haddock
-# Submitted as a solution to Project Euler's Problem 55
+# Submitted as a solution to Project Euler's Problem 56
 
 # Considering natural numbers of the form, a^b, where a, b < 100, what is the maximum digital sum?
 
