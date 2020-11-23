@@ -19,30 +19,17 @@ def get_consec_primes(a,b):
         n += 1
     return n
 
-def quadratic_generator(max_a,max_b):
+def quadratic_generator(max_a,max_b) -> int:
     max_run=0
     max_value=1
-    for i in [2]+list(range(3,max_b+1,2)):
+    for i in range(3,max_b+1,2):
         if not is_prime(i):
             continue
         for j in range(max_a+1):
-            for sign in range(4):
-                if sign == 0:
-                    a = j
-                    b = i
-                if sign == 1:
-                    a = j
-                    b = -i
-                elif sign == 2:
-                    a = -j
-                    b = i
-                elif sign == 3:
-                    a = -j
-                    b = -i
-                rv = get_consec_primes(a,b)
-                if rv > max_run:
-                    max_run = rv
-                    max_value = a*b
+            for sign in {(j,i),(j,-i),(-j,i),(-j,-i)}:
+                if (run_len := get_consec_primes(*sign)) > max_run:
+                    max_run = run_len
+                    max_value = sign[0] * sign[1]
     return max_value
 
 print(quadratic_generator(1000,1000))
