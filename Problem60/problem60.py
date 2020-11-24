@@ -9,30 +9,6 @@
 from itertools import combinations as combs
 from math import log10 as log
 
-class Pair:
-    def __init__(self,a,b):
-        self.num1 = a
-        self.num2 = b
-    
-    def evaluate(self,is_prime):
-        a = self.num1
-        b = self.num2
-        len_a = int(log(a))+1
-        len_b = int(log(b))+1
-        return is_prime(int(a*(10**len_b)+b)) and is_prime(int(b*(10**len_a)+a))
-
-    def __eq__(self,other):
-        return (self.num1 == other.num1 and self.num2 == other.num2) or (self.num1 == other.num2 and self.num2 == other.num1)
-
-    def __str__(self):
-        return '(' + str(self.num1) + ',' + str(self.num2) + ')'
-
-    # Szudzik's function
-    def __hash__(self):
-        a = self.num1
-        b = self.num2
-        return a * a + a + b if a >= b else b * b + a
-
 def is_prime(n):
     if n == 2 or n == 3:
         return True
