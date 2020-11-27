@@ -5,7 +5,7 @@
 # https://en.wikipedia.org/wiki/Euler%27s_totient_function
 
 
-from EulerLib.functions import is_prime,prime_factors,sieve
+from EulerLib.functions import prime_factors,sieve
 from math import prod
 
 def totient(n,primes=None):
@@ -16,7 +16,6 @@ def least_totient(max_):
     primes = sieve(max_)
     best_n = 0
     best_tot = 1
-    print('Found primes')
     for n in range(2,max_):
         if n in primes:
             continue
