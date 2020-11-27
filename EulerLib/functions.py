@@ -1,3 +1,5 @@
+from math import prod
+
 def is_prime(n):
     if n == 2 or n == 3:
         return True
@@ -24,3 +26,7 @@ def sieve(max_):
         for j in range(i**2,max_,i):
             composite.add(j)
     return set(range(2,max_)).difference(composite)
+
+def totient(n,primes=None):
+    factors = prime_factors(n,primes)
+    return round(prod([1-(1/factor) for factor in factors]) * n)
