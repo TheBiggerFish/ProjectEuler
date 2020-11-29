@@ -10,6 +10,14 @@ def is_prime(n):
             return False
     return True
 
+def factors(n):
+    f = set()
+    for i in range(1,n//2+1):
+        if n%i == 0:
+            f.add(i)
+            f.add(n//i)
+    return f
+    
 def prime_factors(n,primes=None):
     if (primes is None and is_prime(n)) or (primes is not None and n in primes):
         return {n}
