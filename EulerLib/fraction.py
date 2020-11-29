@@ -35,6 +35,9 @@ class Fraction:
     def __gt__(self,other):
         return self.evaluate() > other.evaluate()
 
+    def __eq__(self,other):
+        return self.evaluate() == other.evaluate()
+
     @staticmethod
     def lcd(f1,f2):
         return lcm(f1.d,f2.d)
@@ -43,7 +46,7 @@ class Fraction:
         div = gcd(self.n,self.d)
         return Fraction(self.n//div,self.d//div)
 
-    def hash(self):
+    def __hash__(self):
         if self.n >= self.d:
             return self.n * self.n + self.n + self.d
         else:
