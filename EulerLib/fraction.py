@@ -5,6 +5,9 @@ class Fraction:
         self.n = numer
         self.d = denom
     
+    def is_proper(self):
+        return self.n < self.d
+
     def evaluate(self):
         return self.n / self.d
 
@@ -25,6 +28,12 @@ class Fraction:
 
     def __str__(self):
         return str(self.n) + '/' + str(self.d)
+    
+    def __lt__(self,other):
+        return self.evaluate() < other.evaluate()
+
+    def __gt__(self,other):
+        return self.evaluate() > other.evaluate()
 
     @staticmethod
     def lcd(f1,f2):
@@ -34,8 +43,11 @@ class Fraction:
         div = gcd(self.n,self.d)
         return Fraction(self.n//div,self.d//div)
 
-
-
+    def hash(self):
+        if self.n >= self.d:
+            return self.n * self.n + self.n + self.d
+        else:
+            return self.d * self.d + self.n
 
 class ContinuedFraction:
     def __init__(self,addend=0,numer=0,denom=None):
