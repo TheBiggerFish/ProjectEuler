@@ -12,7 +12,7 @@ def is_prime(n):
 
 def factors(n):
     f = set()
-    for i in range(1,n//2+1):
+    for i in range(1,int(n**0.5)+1):
         if n%i == 0:
             f.add(i)
             f.add(n//i)
