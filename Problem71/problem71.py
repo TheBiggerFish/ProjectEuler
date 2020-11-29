@@ -15,4 +15,4 @@ def gen_proper_fractions(max_d,min_d=1,min_ratio=0.0,max_ratio=1.0):
             n += 1
     return fracs
 
-print(max(gen_proper_fractions(max_d=10**6,min_ratio=299999/700000,max_ratio=3/7)))
+print(max(gen_proper_fractions(max_d=10**6,min_ratio=299999/700000,max_ratio=3/7)).n)
