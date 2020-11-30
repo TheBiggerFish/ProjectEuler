@@ -1,4 +1,5 @@
 from math import prod
+from sympy.ntheory.factor_ import totient
 
 def is_prime(n):
     if n == 2 or n == 3:
@@ -18,13 +19,21 @@ def factors(n):
             f.add(n//i)
     return f
     
-def prime_factors(n,primes=None):
-    if (primes is None and is_prime(n)) or (primes is not None and n in primes):
-        return {n}
-    for i in range(2,n):
+def prime_factors(n):
+    f = set()
+    if n % 2 == 0:
+        f.add(2)
+        while n % 2 == 0:
+            n //= 2
+    
+    for i in range(3,int(n**0.5),2):
         if n % i == 0:
-            return prime_factors(i) | prime_factors(int(n/i))
-    return set()
+            f.add(i)
+            while n % i == 0:
+                n //= i
+    if n > 1:
+        f.add(n)
+    return f
 
 def sieve(max_):
     composite = set()
@@ -35,6 +44,20 @@ def sieve(max_):
             composite.add(j)
     return set(range(2,max_)).difference(composite)
 
-def totient(n,primes=None):
-    factors = prime_factors(n,primes)
-    return round(prod([1-(1/factor) for factor in factors]) * n)
+def are_coprime(n1,n2):
+    if n1 % n2 == 0 or n2 % n1 == 0:
+        return False
+    for factor in prime_factors(n1):
+        if n2 % factor == 0:
+            return False
+    return True
+
+# https://math.stackexchange.com/questions/1854197/calculate-the-number-of-integers-in-a-given-interval-that-are-coprime-to-a-given
+def range_totient(n,max_,min_=2):
+    full_range = int(max_-min_-((max_-min_)%n))
+    rt = int(round(totient(n)/n * full_range,12))
+    new_min = min_ + full_range + 1
+    for i in range(new_min,max_+1):
+        if are_coprime(i,n):
+            rt += 1
+    return rt
