@@ -20,7 +20,7 @@ def get_total_score(names):
         total += (i+1) * get_word_value(names[i])
     return total
 
-with open('Problem22/names.txt') as csvfile:
+with open('Problem022/names.txt') as csvfile:
     reader = csv.reader(csvfile,delimiter=',',quotechar='"')
     names = reader.__next__()
     print(get_total_score(sorted(names)))

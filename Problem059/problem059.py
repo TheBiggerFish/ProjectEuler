@@ -32,4 +32,4 @@ def decrypt(filename):
                         return sum([ord(c) for c in dec])
     return -1
 
-print(decrypt('Problem59/cipher.txt'))
+print(decrypt('Problem059/cipher.txt'))

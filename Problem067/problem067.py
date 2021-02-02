@@ -16,4 +16,4 @@ def find_max_path(triangle):
             triangle[row][col] += max(l,r)
     return triangle[0][0]
 
-print(find_max_path(read('Problem67/triangle.txt')))
+print(find_max_path(read('Problem067/triangle.txt')))

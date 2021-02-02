@@ -24,7 +24,7 @@ def find_triangle_words(lst,tri_nums):
     return total
 
 tri_nums = [int(n*(n+1)/2) for n in range(1,50)]
-with open('Problem42/words.txt') as csvfile:
+with open('Problem042/words.txt') as csvfile:
     reader = csv.reader(csvfile,delimiter=',',quotechar='"')
     words = reader.__next__()
     print(find_triangle_words(sorted(words),tri_nums))

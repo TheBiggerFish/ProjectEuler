@@ -8,7 +8,7 @@
 from EulerLib.point import Point
 from queue import PriorityQueue
 
-with open('Problem67/triangle.txt') as f:
+with open('Problem067/triangle.txt') as f:
     grid = [[int(item) for item in row.strip().split(' ')] for row in f]
 prev = {}
 
