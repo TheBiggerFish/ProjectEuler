@@ -14,7 +14,6 @@ UPPER_N = 4083
 LOWER_N = 1
 
 valid_triangles = 0
-explored_triples = set()
 
 for n in range(LOWER_N, UPPER_N):
     for m in range(n + 1, UPPER_M, 2):
@@ -28,9 +27,6 @@ for n in range(LOWER_N, UPPER_N):
         if c % abs(a-b) != 0:
             continue
 
-        if (a, b, c) in explored_triples:
-            continue
-
         sum_ = a + b + c
         k = 1
         while k*sum_ < MAX_PERIMETER:
@@ -38,13 +34,9 @@ for n in range(LOWER_N, UPPER_N):
             
             difference = abs(ka - kb)
 
-            if ka == 3 and kb == 4 and kc == 5 and kc % difference == 0:
-                print(ka, kb, kc, difference)
-
             if kc % difference == 0:
                 valid_triangles += 1
 
-            explored_triples.add((ka, kb, kc))
             k += 1
 
 print(valid_triangles)
