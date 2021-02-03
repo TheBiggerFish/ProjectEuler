@@ -1,4 +1,4 @@
-from math import lcm,gcd
+from math import gcd
 
 class Fraction:
     def __init__(self,numer,denom=1):
@@ -39,8 +39,12 @@ class Fraction:
         return self.evaluate() == other.evaluate()
 
     @staticmethod
+    def __lcm(a,b):
+        return abs(a*b) // gcd(a,b)
+
+    @staticmethod
     def lcd(f1,f2):
-        return lcm(f1.d,f2.d)
+        return Fraction.__lcm(f1.d,f2.d)
 
     def reduce(self):
         div = gcd(self.n,self.d)

@@ -1,4 +1,4 @@
-from math import prod
+from math import prod,gcd
 from sympy.ntheory.factor_ import totient
 
 def is_prime(n):
@@ -47,10 +47,7 @@ def sieve(max_):
 def are_coprime(n1,n2):
     if n1 % n2 == 0 or n2 % n1 == 0:
         return False
-    for factor in prime_factors(n1):
-        if n2 % factor == 0:
-            return False
-    return True
+    return gcd(n1,n2) == 0
 
 # https://math.stackexchange.com/questions/1854197/calculate-the-number-of-integers-in-a-given-interval-that-are-coprime-to-a-given
 def range_totient(n,max_,min_=2):
