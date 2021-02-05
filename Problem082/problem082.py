@@ -4,7 +4,7 @@
 # Find the minimal path sum from the left column to the right column in matrix.txt
 
 
-from EulerLib.point import Point
+from EulerLib.geometry import Point
 from queue import PriorityQueue
 
 with open('Problem082/matrix.txt') as f:

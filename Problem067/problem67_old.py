@@ -5,7 +5,7 @@
 # https://en.wikipedia.org/wiki/A*_search_algorithm
 
 
-from EulerLib.point import Point
+from EulerLib.geometry import Point
 from queue import PriorityQueue
 
 with open('Problem067/triangle.txt') as f:
