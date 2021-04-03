@@ -1,5 +1,5 @@
 # Written by Cameron Haddock
-# Submitted as a solution to Project Euler's Problem 85
+# Submitted as a solution to Project Euler's Problem 86
 
 from math import gcd
 
