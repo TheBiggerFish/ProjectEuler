@@ -11,7 +11,7 @@ from EulerLib.debug import timer
 import threading
 import random
 
-n = 2**26
+n = 2**20
 num_threads = 16
 n_per_thread = n // num_threads
 results = [None] * num_threads
@@ -20,8 +20,8 @@ results = [None] * num_threads
 def probability(n,thread_id):
     wins4,wins6 = 0,0
     for _ in range(n):
-        d4 = random.randint(1,4)
-        d6 = random.randint(1,6)
+        d4 = sum(random.randint(1,4) for _ in range(9))
+        d6 = sum(random.randint(1,6) for _ in range(6))
         if d4 > d6:
             wins4 += 1
     results[thread_id] = {'wins4':wins4,'wins6':wins6}
@@ -38,4 +38,3 @@ for t in threads:
     t.join()
 
 print(sum(map(lambda p: p['wins4'], results))/n)
-# print(results)
