@@ -1,11 +1,10 @@
 #http://numba.pydata.org/numba-doc/0.35.0/cuda/random.html
 
-from __future__ import print_function, absolute_import
-
 from numba import cuda
 from numba.cuda.random import create_xoroshiro128p_states, xoroshiro128p_uniform_float32
 import numpy as np
 import time
+import random
 
 @cuda.jit
 def compute_pi(rng_states, iterations, out):
@@ -23,9 +22,9 @@ def compute_pi(rng_states, iterations, out):
 
     out[thread_id] = 4.0 * inside / iterations
 
-threads_per_block = 64
-blocks = 24
-rng_states = create_xoroshiro128p_states(threads_per_block * blocks, seed=1)
+threads_per_block = 32
+blocks = 40
+rng_states = create_xoroshiro128p_states(threads_per_block * blocks, seed=random.randint(1,2**64))
 out = np.zeros(threads_per_block * blocks, dtype=np.float32)
 
 start = time.perf_counter()

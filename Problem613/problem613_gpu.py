@@ -11,39 +11,35 @@ from __future__ import print_function, absolute_import
 
 from numba import cuda
 from numba.cuda.random import create_xoroshiro128p_states, xoroshiro128p_uniform_float32
-from math import pi
+from math import pi,cos,sin
 import numpy as np
 import time
 import random
 
-ITERATIONS = 10**3
+ITERATIONS = 1028 * 10**3
 BLOCKS = 40
 THREADS_PER_BLOCK = 32 #1280 cores / 40 blocks = 32 cores per block
-PRECISION = 10**2
+PRECISION = 10**3
 MAX_Y = 30 * PRECISION
 MAX_X = 40 * PRECISION
 STEP_SIZE = PRECISION / 10
 
 
 @cuda.jit
-def disoriented_ant(iterations,out):
+def disoriented_ant(rng_states,iterations,out):
     slope_func = lambda x: -3 * x / 4 + MAX_Y
     thread_id = cuda.grid(1)
     top = 0
-    np.random.seed(1)
 
     for _ in range(iterations):
         x = 1
         y = 1
-        # x = np.random.random_integers(0,MAX_X)
-        # y = np.random.random_integers(0,slope_func(x))
+        x = int(xoroshiro128p_uniform_float32(rng_states,thread_id)*(MAX_X+1))
+        y = int(xoroshiro128p_uniform_float32(rng_states,thread_id)*(slope_func(x)+1))
         while 0 < x < MAX_X and 0 < y < slope_func(x):
-            # rand_angle = random.uniform(0,2*np.pi)
-            rand_angle = 0
-            x += 1
-            y += 1
-            # x += np.cos(rand_angle) * STEP_SIZE
-            # y += np.sin(rand_angle) * STEP_SIZE
+            rand_angle = int(xoroshiro128p_uniform_float32(rng_states,thread_id)*(2*pi))
+            x += cos(rand_angle) * STEP_SIZE
+            y += sin(rand_angle) * STEP_SIZE
         if y > slope_func(x):
             top += 1
 
@@ -53,7 +49,7 @@ rng_states = create_xoroshiro128p_states(THREADS_PER_BLOCK * BLOCKS, seed=random
 out = np.zeros(THREADS_PER_BLOCK * BLOCKS, dtype=np.uint64)
 
 start = time.perf_counter()
-disoriented_ant[BLOCKS,THREADS_PER_BLOCK](ITERATIONS, out)
+disoriented_ant[BLOCKS,THREADS_PER_BLOCK](rng_states,ITERATIONS//(THREADS_PER_BLOCK*BLOCKS), out)
 end = time.perf_counter()
-print('Total sum:', out.sum())
+print('Total sum:', out.sum()/ITERATIONS)
 print('time:',round(end-start,4))
