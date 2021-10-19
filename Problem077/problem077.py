@@ -5,7 +5,8 @@
 # Based on my solution to problem 76
 
 
-from EulerLib.functions.primes import sieve
+from fishpy.primes import sieve
+
 
 def count_sums(value,index,primes):
     if value < 0 or index >= len(primes):

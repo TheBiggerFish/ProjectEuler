@@ -4,8 +4,9 @@
 # Find the minimal path sum from the top left to the bottom right by only moving right and down in matrix.txt
 
 
-from EulerLib.geometry import Point
 from queue import PriorityQueue
+
+from fishpy.geometry import Point
 
 with open('Problem081/matrix.txt') as f:
     grid = [[int(item) for item in row.strip().split(',')] for row in f]

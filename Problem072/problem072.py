@@ -4,10 +4,8 @@
 # How many elements would be contained in the set of reduced proper fractions for d ≤ 1,000,000?
 
 
-from EulerLib.fraction import Fraction
-from EulerLib.functions.primes import prime_factors,is_prime,range_totient,sieve
+from fishpy.primes import prime_factors, range_totient, sieve
 from sympy.ntheory.factor_ import totient as phi
-from cProfile import run
 
 
 def num_proper_fractions(max_d,min_d=1):

@@ -6,10 +6,11 @@
 # Given that 0 ≤ x1, y1, x2, y2 ≤ 50, how many right triangles can be formed?
 
 
-from EulerLib.geometry import LineSegment, Point, Line, Triangle
 import matplotlib.collections as mc
 import matplotlib.pyplot as plt
 import numpy as np
+from fishpy.geometry import Line, LineSegment, Point
+
 
 def how_many_right_triangles(bounds):
     count = 0

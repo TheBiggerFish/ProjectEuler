@@ -4,7 +4,8 @@
 # For the first one hundred natural numbers, find the total of the digital sums of the first one hundred decimal digits for all the irrational square roots.
 
 
-from EulerLib.root import IntegerSquareRoot
+from fishpy.root import IntegerSquareRoot
+
 
 def digital_sum(list_:list) -> int:
     return sum(n for n in list_)

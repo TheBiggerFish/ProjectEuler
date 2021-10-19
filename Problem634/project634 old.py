@@ -4,22 +4,22 @@
 # Define F(n) to be the number of integers x <= n that can be written in the form x = a^2 * b^3, where a and b are integers not necessarily different and both greater than 1.
 # Find F(9 x 10^18).
 
-# from EulerLib.debug import profile,timer
+from fishpy.debug import profile,timer
 import numpy as np
 import threading
 from math import log
 
-n = 9*10**18
+n = 8*10**16
 highest = int(n**(1/5))+1
 print(n)
-num_threads = 8
+num_threads = 16
 precision = 8
 
 s = set()
 # sets = []
 
-# @timer
 # In other words, for each input a, how many possible b values exist
+@timer
 def search(low, high, ind):
     # a**2 * b**3
     
@@ -81,3 +81,5 @@ for t in threads:
 # duplicates = sum([len(count) for count in sets]) - len(s)
 # print('Duplicates:',duplicates)
 print(len(s))
+m = max(s)
+print('Bits of largest result:',len(f'{m:0b}'))

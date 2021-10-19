@@ -7,7 +7,8 @@
 # https://en.wikipedia.org/wiki/Pell%27s_equation
 
 
-from EulerLib.fraction import ContinuedFraction
+from fishpy.fraction import ContinuedFraction
+
 
 def pell_solution(D):
     if (D**0.5).is_integer():

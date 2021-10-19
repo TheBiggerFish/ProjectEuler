@@ -7,9 +7,10 @@
 #What is the probability that Pyramidal Pete beats Cubic Colin? Give your answer rounded to seven decimal places in the form 0.abcdefg
 
 
-from EulerLib.debug import timer
-import threading
 import random
+import threading
+
+from fishpy.debug import timer
 
 n = 2**20
 num_threads = 16

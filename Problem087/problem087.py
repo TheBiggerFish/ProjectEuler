@@ -4,7 +4,8 @@
 # How many numbers below fifty million can be expressed as the sum of a prime square, prime cube, and prime fourth power?
 
 
-from EulerLib.functions.primes import sieve
+from fishpy.primes import sieve
+
 
 def num_sums_below(sum_bound,prime_bound):
 

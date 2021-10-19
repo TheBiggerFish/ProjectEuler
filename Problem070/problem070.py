@@ -4,8 +4,10 @@
 # Find the value of n, 1 < n < 107, for which φ(n) is a permutation of n and the ratio n/φ(n) produces a minimum.
 
 
-from EulerLib.functions.primes import sieve,prime_factors
 from math import prod
+
+from fishpy.primes import prime_factors, sieve
+
 
 def is_permutation(a,b):
     return sorted(str(a)) == sorted(str(b))

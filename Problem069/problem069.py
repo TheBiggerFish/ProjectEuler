@@ -5,8 +5,10 @@
 # https://en.wikipedia.org/wiki/Euler%27s_totient_function
 
 
-from EulerLib.functions.primes import prime_factors,sieve
 from math import prod
+
+from fishpy.primes import prime_factors, sieve
+
 
 def totient(n,primes=None):
     factors = prime_factors(n,primes)

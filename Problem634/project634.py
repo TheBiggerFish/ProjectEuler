@@ -4,8 +4,8 @@
 # Define F(n) to be the number of integers x <= n that can be written in the form x = a^2 * b^3, where a and b are integers not necessarily different and both greater than 1.
 # Find F(9 x 10^18).
 
-from EulerLib.debug import profile,timer
 import numpy as np
+from fishpy.debug import profile, timer
 
 n = 2*10**4
 highest = int(n**(1/5))+1
@@ -51,6 +51,7 @@ def old_search(high):
             s.add(x)
     for c in sorted(counts.keys()):
         print(c,counts[c])
+    
 
 
 def search(high):
@@ -72,7 +73,7 @@ def search(high):
                 if a**2*b**3 not in found:
                     found.add(a**2*b**3)
                 else:
-                    print('WHY')
+                    print('Double')
                 print(string,a**2*b**3)
                 count += 1
         if q <= n / 4 and r <= n:

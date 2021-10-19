@@ -4,7 +4,8 @@
 # By listing the set of reduced proper fractions for d ≤ 1,000,000 in ascending order of size, find the numerator of the fraction immediately to the left of 3/7.
 
 
-from EulerLib.fraction import Fraction
+from fishpy.fraction import Fraction
+
 
 def gen_proper_fractions(max_d,min_d=1,min_ratio=0.0,max_ratio=1.0):
     fracs = set()

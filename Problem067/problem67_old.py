@@ -5,8 +5,9 @@
 # https://en.wikipedia.org/wiki/A*_search_algorithm
 
 
-from EulerLib.geometry import Point
 from queue import PriorityQueue
+
+from fishpy.geometry import Point
 
 with open('Problem067/triangle.txt') as f:
     grid = [[int(item) for item in row.strip().split(' ')] for row in f]

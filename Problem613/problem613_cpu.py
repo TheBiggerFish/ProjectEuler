@@ -7,12 +7,13 @@
 # Give your answer rounded to 10 digits after the decimal point.
 
 
-import threading
 import random
-from EulerLib.geometry import Triangle,Point
-from math import cos,sin,pi
-from typing import List
+import threading
 import time
+from math import cos, pi, sin
+from typing import List
+
+from fishpy.geometry import Point, Triangle
 
 ITERATIONS = 10**6
 THREADS = 8
