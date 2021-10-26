@@ -1,8 +1,11 @@
 # Written by Cameron Haddock & Daniel Millson
 # Submitted as a solution to Project Euler's Problem 144
 
-from sympy import Symbol, solve
 from math import isclose
+from typing import Set, Tuple
+
+from fishpy.geometry import Point
+from sympy import Symbol, solve
 
 A = 5  # semi-minor axis
 B = 10 # semi-major axis
@@ -10,16 +13,16 @@ INITIAL_C = B + 0.1
 INITIAL_M = -19.7/1.4
 PRECISION = 50
 
-def point_on_ellipse(x, y) -> bool:
-    return isclose(4*(x**2) + (y**2), 100, abs_tol=0.001)
+def point_on_ellipse(p:Point) -> bool:
+    return isclose(4*(p.x**2) + (p.y**2), 100, abs_tol=0.001)
 
-def get_tangent_slope(x, y) -> float:
-    return -4 * x / y
+def get_tangent_slope(p:Point) -> float:
+    return -4 * p.x / p.y
 
-def get_normal_slope(x, y) -> float:
-    return -1 / get_tangent_slope(x, y)
+def get_normal_slope(p:Point) -> float:
+    return -1 / get_tangent_slope(p)
 
-def points_of_intersect(m, c, a = A, b = B) -> (float, float):
+def points_of_intersect(m, c, a = A, b = B) -> Tuple[Point]:
     x = Symbol('x')
     line_eq = m*x + c
     intersect_eq = ((a**2)*(m**2) + b**2)*(x**2) + (2*(a**2)*m*c)*x + (a**2 * (c**2 - b**2))
@@ -29,25 +32,24 @@ def points_of_intersect(m, c, a = A, b = B) -> (float, float):
     y1 = line_eq.subs(x, roots[0])
     y2 = line_eq.subs(x, roots[1])
 
-    p1 = (round(roots[0], PRECISION), round(y1, PRECISION))
-    p2 = (round(roots[1], PRECISION), round(y2, PRECISION))
+    p1 = Point(round(roots[0], PRECISION), round(y1, PRECISION))
+    p2 = Point(round(roots[1], PRECISION), round(y2, PRECISION))
 
-    return {p1, p2}
+    return p1, p2
 
 # http://www.sdmath.com/math/geometry/reflection_across_line.html
-def reflect_point_across_line(x, y, m, c) -> (float, float):
-    u = ((1 - m**2)*x + 2*m*y - 2*m*c)/((m**2) + 1)
-    v = ((m**2 - 1)*y + 2*m*x + 2*c)/((m**2) + 1)
-    return u, v
+def reflect_point_across_line(p:Point, m, c) -> Point:
+    u = ((1 - m**2)*p.x + 2*m*p.y - 2*m*c)/((m**2) + 1)
+    v = ((m**2 - 1)*p.y + 2*m*p.x + 2*c)/((m**2) + 1)
+    return Point(u, v)
 
-def points_are_close(x1, y1, x2, y2, p=4) -> bool:
-    return (((x1-x2)**2) + ((y1-y2)**2))**0.5 < 10**-p
+def points_are_close(p1:Point, p2:Point, precision:int=4) -> bool:
+    return (((p1.x-p2.x)**2) + ((p1.y-p2.y)**2))**0.5 < 10**(-precision)
 
-def order_points(points,old_point) -> [(float, float), (float, float)]:
-    points = tuple(points)
+def order_points(points:Tuple[Point],old_point:Point) -> Tuple[Point,Point]:
     p1, p2 = points[0], points[1]
 
-    if points_are_close(*p1,*old_point):
+    if points_are_close(p1,old_point):
         return p2, old_point
     return p1, old_point
     
@@ -63,20 +65,20 @@ def main():
         point_of_reflection, old_point = order_points(points, old_point)
         
         # print(points-old_point)
-        if not point_on_ellipse(*point_of_reflection):
+        if not point_on_ellipse(point_of_reflection):
             print("POR not on ellipse")
         print(point_of_reflection, old_point)
 
-        normal_slope = get_normal_slope(*point_of_reflection)
-        normal_c = point_of_reflection[1] - normal_slope * point_of_reflection[0]
+        normal_slope = get_normal_slope(point_of_reflection)
+        normal_c = point_of_reflection.y - normal_slope * point_of_reflection.x
 
-        reflected_point = reflect_point_across_line(*old_point, normal_slope, normal_c)
+        reflected_point = reflect_point_across_line(old_point, normal_slope, normal_c)
 
-        m = (point_of_reflection[1] - reflected_point[1]) / (point_of_reflection[0] - reflected_point[0])
-        c = point_of_reflection[1] - m * point_of_reflection[0]
+        m = (point_of_reflection.y - reflected_point.y) / (point_of_reflection.x - reflected_point.x)
+        c = point_of_reflection.y - m * point_of_reflection.x
 
         old_point = point_of_reflection
-        x, y = old_point[0], old_point[1]
+        x, y = old_point.x, old_point.y
         i += 1
     print(i-1) # Subtract 1 to get number of bounces
 
