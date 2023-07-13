@@ -26,7 +26,7 @@ class FactorFactory:
         if self._is_known_prime(number):
             return result
 
-        for i in range(start, number//2+1):
+        for i in range(start, int(number**0.5)+1):
             if number % i == 0:
                 factorings = self._factor_helper(number//i, i)
                 for factoring in factorings:
@@ -59,14 +59,12 @@ class FactorFactory:
 
 
 def minimal(length: int, factory: FactorFactory):
-    min_ = 2*length
     for i in range(length, 2*length+1):
         for factoring in factory.factor(i):
             factor_list = FactorFactory.to_list(factoring)
-            product = prod(factor_list)
-            if product == sum(factor_list) + (length - len(factor_list)):
-                min_ = min(product, min_)
-    return min_
+            if i == sum(factor_list) + (length - len(factor_list)):
+                return i
+    raise NotImplementedError("Why are we here?")
 
 def product_sum(max_: int) -> int:
     factory = FactorFactory()
@@ -77,7 +75,7 @@ def product_sum(max_: int) -> int:
 
 
 def main():
-    sum_ = product_sum(12)
+    sum_ = product_sum(12000)
     print(f'Total sum: {sum_}')
 
 
