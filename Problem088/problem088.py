@@ -21,19 +21,18 @@ class FactorFactory:
         result: set[frozendict[int, int]] = set()
         if number <= 1:
             return result
-        elif self._is_known_prime(number):
-            result.add(frozendict({number: 1}))
+        
+        result.add(frozendict({number: 1}))
+        if self._is_known_prime(number):
             return result
 
-        for i in range(start, number+1):
+        for i in range(start, number//2+1):
             if number % i == 0:
                 factorings = self._factor_helper(number//i, i)
                 for factoring in factorings:
                     result.add(factoring.set(i, factoring.get(i, 0) + 1))
         if start == 2 and len(result) == 0:
             self.primes.add(number)
-        if number > start:
-            result.add(frozendict({number: 1}))
 
         self.factors[number] = result
         return result
@@ -61,7 +60,7 @@ class FactorFactory:
 
 def minimal(length: int, factory: FactorFactory):
     min_ = 2*length
-    for i in range(length, 2*length):
+    for i in range(length, 2*length+1):
         for factoring in factory.factor(i):
             factor_list = FactorFactory.to_list(factoring)
             product = prod(factor_list)
@@ -78,7 +77,7 @@ def product_sum(max_: int) -> int:
 
 
 def main():
-    sum_ = product_sum(200)
+    sum_ = product_sum(12)
     print(f'Total sum: {sum_}')
 
 
