@@ -1,5 +1,5 @@
 from frozendict import frozendict
-from math import prod
+from fishpy.utility import profile
 
 class FactorFactory:
     def __init__(self):
@@ -74,6 +74,7 @@ def product_sum(max_: int) -> int:
     return sum(terms)
 
 
+@profile
 def main():
     sum_ = product_sum(12000)
     print(f'Total sum: {sum_}')
