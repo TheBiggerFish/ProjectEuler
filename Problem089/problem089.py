@@ -20,7 +20,8 @@ values = {
     'I': 1
 }
 
-def roman_to_arabic(roman:str):
+
+def roman_to_arabic(roman: str):
     sum_ = 0
     while roman != '':
         if len(roman) > 1 and values[roman[0]] < values[roman[1]]:
@@ -30,6 +31,7 @@ def roman_to_arabic(roman:str):
             sum_ += values[roman[0]]
             roman = roman[1:]
     return sum_
+
 
 def arabic_to_roman(arabic):
     roman = ''
@@ -41,13 +43,15 @@ def arabic_to_roman(arabic):
                 break
     return roman
 
+
 def chars_saved(filename):
     saved = 0
-    with open(filename,'r') as f:
+    with open(filename, 'r') as f:
         for line in f:
             old = line.rstrip()
             new = arabic_to_roman(roman_to_arabic(old))
             saved += len(old) - len(new)
     return saved
+
 
 print(chars_saved('Problem089/roman.txt'))

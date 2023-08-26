@@ -1,3 +1,8 @@
+# Written by Cameron Haddock and Daniel Millson
+# Submitted as a solution to Project Euler's Problem 95
+
+# Find the smallest member of the longest amicable chain with no element exceeding one million.
+
 from functools import lru_cache
 from typing import Generator
 

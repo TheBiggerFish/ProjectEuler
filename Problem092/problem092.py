@@ -6,10 +6,11 @@
 def next_in_chain(n):
     return sum([int(digit)**2 for digit in str(n)])
 
+
 def square_chain(max_):
     found = set()
     count = 0
-    for i in range(1,max_):
+    for i in range(1, max_):
         n = i
         while n != 1 and n != 89 and n not in found:
             n = next_in_chain(n)
@@ -17,5 +18,6 @@ def square_chain(max_):
             found.add(i)
             count += 1
     return count
+
 
 print(square_chain(10**7))

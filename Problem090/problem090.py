@@ -17,6 +17,7 @@ constraints = [
     (1, 8),
 ]
 
+
 def meets_constraint(die1, die2, constraint: tuple[int, int]) -> bool:
     if constraint[0] in die1 and constraint[1] in die2:
         return True
@@ -24,8 +25,9 @@ def meets_constraint(die1, die2, constraint: tuple[int, int]) -> bool:
         return True
     return False
 
-def apply_constraints(die1: set[int], die2:set[int]) -> bool:
-    for die in (die1,die2):
+
+def apply_constraints(die1: set[int], die2: set[int]) -> bool:
+    for die in (die1, die2):
         if 9 in die:
             die.remove(9)
             die.add(6)
@@ -34,11 +36,12 @@ def apply_constraints(die1: set[int], die2:set[int]) -> bool:
             return False
     return True
 
-dice = list(combinations(range(0,10), 6))
+
+dice = list(combinations(range(0, 10), 6))
 pairs = []
 for i, die1 in enumerate(dice):
     for _, die2 in enumerate(dice[i+1:]):
-        pairs.append((set(die1),set(die2)))
+        pairs.append((set(die1), set(die2)))
 
 pairs = list(filter(lambda pair: apply_constraints(pair[0], pair[1]), pairs))
 

@@ -1,11 +1,13 @@
 # Written by Cameron Haddock
 # Submitted as a solution to Project Euler's Problem 94
 
+# Find the sum of the perimeters of all almost equilateral triangles with integral side lengths and area and whose perimeters do not exceed one billion.
+
 
 MAX_PERIMETER = 10**9
 
 n = 5
-perim = 16 # perim of 5,5,6
+perim = 16  # perim of 5,5,6
 sum_ = 0
 delta = -1
 
