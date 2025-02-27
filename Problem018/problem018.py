@@ -21,15 +21,11 @@ TRI = [[75],
         [63,66,4,68,89,53,67,30,73,16,69,87,40,31],
         [4,62,98,27,23,9,70,98,73,93,38,53,60,4,23]]
 
-MAX_DEPTH = len(TRI) - 1
-
 @lru_cache
 def max_path(depth: int = 0, pos: int = 0):
-    val = TRI[depth][pos]
-    if depth == MAX_DEPTH:
-        return val
-    
-    return val + max(max_path(depth+1, pos), 
-                     max_path(depth+1, pos+1))
+    if depth >= len(TRI):
+        return 0
+    return TRI[depth][pos] + max(max_path(depth+1, pos), 
+                                 max_path(depth+1, pos+1))
 
 print(max_path())
