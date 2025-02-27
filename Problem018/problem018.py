@@ -3,8 +3,9 @@
 
 # By starting at the top of the triangle below and moving to adjacent numbers on the row below, find the maximum total from top to bottom of the triangle below:
 
+from functools import lru_cache
 
-tri = [[75],
+TRI = [[75],
         [95,64],
         [17,47,82],
         [18,35,87,10],
@@ -20,26 +21,15 @@ tri = [[75],
         [63,66,4,68,89,53,67,30,73,16,69,87,40,31],
         [4,62,98,27,23,9,70,98,73,93,38,53,60,4,23]]
 
-# Build a list of all binary numbers of length dim where dim is the width/height of the triangle
-# Use the list to follow every possible path through the triangle
-def max_path(tri):
-    dim = len(tri)
-    paths = []
-    values = []
-    for i in range(2**dim):
-        string = "{0:b}".format(i).rjust(dim,'0')
-        paths += [string]
+MAX_DEPTH = len(TRI) - 1
 
-    for path in paths:
-        col = 0
-        row = 0
-        sum_ = 0
-        for step in path:
-            sum_ += tri[col][row]
-            col += 1
-            if step == '1':
-                row += 1
-        values.append(sum_)
-    return max(values)
+@lru_cache
+def max_path(depth: int = 0, pos: int = 0):
+    val = TRI[depth][pos]
+    if depth == MAX_DEPTH:
+        return val
+    
+    return val + max(max_path(depth+1, pos), 
+                     max_path(depth+1, pos+1))
 
-print(max_path(tri))
+print(max_path())
