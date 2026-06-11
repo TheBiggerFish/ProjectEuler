@@ -4,27 +4,34 @@ import (
 	"bufio"
 	"cmp"
 	"encoding/binary"
-	"flag"
 	"fmt"
 	"math"
 	"os"
-	"runtime/pprof"
 	"slices"
 	"sort"
-	"strings"
 
 	bin "math/bits"
 )
 
-var PRIME_MAX uint64 = 10_000_000
-var MAX_PRECOMP_TREE int = 1_000_000
-var PRIME_SET map[uint64]struct{}
-var PRIME_SLICE []uint64
-var SOLVE = []uint64{0, 0, 2, 2, 8, 4, 32, 8, 256, 72, 3456, 540, 20480, 1800, 276480, 512, 10321920, 36000, 185794560, 306180, 3236954112, 2700000, 81749606400, 2160000, 1961990553600, 6998400, 51011754393600, 293932800, 1428329123020800, 1233357840000, 40260046159872000, 26129782224000}
-var SOLVE_TREE BinaryTree
-var KNOWN_VALUES = make(map[uint64][]uint64)
-var KNOWN_TREES = make(map[uint64]uint64)
+// The number of primes loaded into PRIME_SET and PRIME_SLICE
+var PRIME_MAX uint64 = 1_000_000
 
+// The max number n to precompute for KNOWN_VALUES
+var MAX_PRECOMP_TREE int = 1_000_000
+
+// PRIME_SET is a hash set of the first PRIME_MAX prime numbers
+var PRIME_SET map[uint64]struct{}
+
+// PRIME_SLICE is a slice of the first PRIME_MAX prime numbers in ascending order
+var PRIME_SLICE []uint64
+
+// SOLVE represents known solutions to the problem which are used for answer-checking
+var SOLVE = []uint64{0, 0, 2, 2, 8, 4, 32, 8, 256, 72, 3456, 540, 20480, 1800, 276480, 512, 10321920, 36000, 185794560, 306180, 3236954112, 2700000, 81749606400, 2160000, 1961990553600, 6998400, 51011754393600, 293932800, 1428329123020800, 1233357840000, 40260046159872000, 26129782224000}
+
+// KNOWN_VALUES is the mapping from tree-encoding e to the numbers n where T(n) would be encoded as e
+var KNOWN_VALUES = make(map[uint64][]uint64)
+
+// Loads precomputed primes from a binary file
 func loadPrimes() (map[uint64]struct{}, []uint64) {
 	// Try reading a precomputed primes file written by `writePrimesToFile`.
 	f, err := os.Open("Problem829/primes.bin")
@@ -60,6 +67,7 @@ func loadPrimes() (map[uint64]struct{}, []uint64) {
 	panic("failed to load primes")
 }
 
+// precomputeTrees generates KNOWN_VALUES for composite numbers up to a value of MAX_PRECOMP_TREE
 func precomputeTrees() {
 	for i := 2; i < MAX_PRECOMP_TREE; i++ {
 		if _, ok := PRIME_SET[uint64(i)]; ok {
@@ -71,7 +79,6 @@ func precomputeTrees() {
 		encoding := tree.GetSubTreeShapeEncoding(0)
 		if encoding != 0 {
 			KNOWN_VALUES[encoding] = append(KNOWN_VALUES[encoding], uint64(i))
-			KNOWN_TREES[uint64(i)] = encoding
 		}
 	}
 }
@@ -91,24 +98,7 @@ func (tree *BinaryTree) SetNode(nodeId int, value uint64) {
 	tree.Values[nodeId] = value
 }
 
-func (tree *BinaryTree) LeftChild(parentNode int) int {
-	return parentNode*2 + 1
-}
-
-func (tree *BinaryTree) RightChild(parentNode int) int {
-	return parentNode*2 + 2
-}
-
-// InsertLeftChild inserts value as the left child of parentNode.
-func (tree *BinaryTree) InsertLeftChild(parentNode int, value uint64) {
-	tree.SetNode(tree.LeftChild(parentNode), value)
-}
-
-// InsertRightChild inserts value as the right child of parentNode.
-func (tree *BinaryTree) InsertRightChild(parentNode int, value uint64) {
-	tree.SetNode(tree.RightChild(parentNode), value)
-}
-
+// GetNode fetches the value stored at the given node id, defaulting to 0 if out of bounds
 func (tree *BinaryTree) GetNode(node int) uint64 {
 	if node < 0 || node >= len(tree.Values) {
 		return 0
@@ -116,67 +106,7 @@ func (tree *BinaryTree) GetNode(node int) uint64 {
 	return tree.Values[node]
 }
 
-func (tree *BinaryTree) GetLeftChild(parentNode int) uint64 {
-	return tree.GetNode(tree.LeftChild(parentNode))
-}
-
-func (tree *BinaryTree) GetRightChild(parentNode int) uint64 {
-	return tree.GetNode(tree.RightChild(parentNode))
-}
-
-func (tree *BinaryTree) HasSameShape(other *BinaryTree) bool {
-	if len(tree.Values) != len(other.Values) {
-		return false
-	}
-	for i := range len(tree.Values) {
-		if tree.Values[i] == 0 && other.Values[i] != 0 {
-			return false
-		}
-		if tree.Values[i] != 0 && other.Values[i] == 0 {
-			return false
-		}
-	}
-	return true
-}
-
-func (tree *BinaryTree) getSubTreeHelper(originNode, destNode int, subTree *BinaryTree) {
-	if originNode >= len(tree.Values) || tree.Values[originNode] == 0 {
-		return
-	}
-	subTree.SetNode(destNode, tree.GetNode(originNode))
-	tree.getSubTreeHelper(originNode*2+1, destNode*2+1, subTree)
-	tree.getSubTreeHelper(originNode*2+2, destNode*2+2, subTree)
-}
-
-func (tree *BinaryTree) GetSubTree(node int) BinaryTree {
-	subTree := BinaryTree{Values: make([]uint64, 0, len(tree.Values))}
-	tree.getSubTreeHelper(node, 0, &subTree)
-	return subTree
-}
-
-func (tree *BinaryTree) insertSubTreeHelper(originNode, destNode int, subTree *BinaryTree) {
-	if originNode >= len(subTree.Values) && destNode >= len(tree.Values) {
-		return
-	} else if originNode >= len(subTree.Values) || destNode >= len(tree.Values) {
-	} else if subTree.Values[originNode] == 0 && tree.Values[destNode] == 0 {
-		return
-	}
-	tree.SetNode(destNode, subTree.GetNode(originNode))
-	tree.insertSubTreeHelper(originNode*2+1, destNode*2+1, subTree)
-	tree.insertSubTreeHelper(originNode*2+2, destNode*2+2, subTree)
-}
-
-func (tree *BinaryTree) InsertSubTree(node int, subTree BinaryTree) {
-	tree.insertSubTreeHelper(0, node, &subTree)
-	var i int
-	for i = len(tree.Values) - 1; i > 0; i-- {
-		if tree.Values[i] != 0 {
-			break
-		}
-	}
-	tree.Values = tree.Values[:i+1]
-}
-
+// getStructureTreeHelper is the recursive helper function GetStructureTree()
 func (tree *BinaryTree) getStructureTreeHelper(node int, structureTree *BinaryTree) uint64 {
 	if node >= len(tree.Values) || tree.Values[node] == 0 {
 		return uint64(0)
@@ -194,12 +124,16 @@ func (tree *BinaryTree) getStructureTreeHelper(node int, structureTree *BinaryTr
 	return value
 }
 
+// GetStructureTree returns the "structure tree" for the current tree.
+// The structure tree is a tree with the same shape, but the value of
+// every node reflects the number of leaf nodes below on the tree.
 func (tree *BinaryTree) GetStructureTree() BinaryTree {
 	result := BinaryTree{Values: make([]uint64, len(tree.Values))}
 	tree.getStructureTreeHelper(0, &result)
 	return result
 }
 
+// getSubTreeShapeEncodingHelper is the recursive helper function for GetSubTreeShapeEncoding()
 func (tree *BinaryTree) getSubTreeShapeEncodingHelper(originNode, destNode int, shapeSlice *uint64) error {
 	if originNode >= len(tree.Values) || tree.Values[originNode] == 0 || destNode >= 64 {
 		return fmt.Errorf("node out of bounds or empty")
@@ -211,6 +145,8 @@ func (tree *BinaryTree) getSubTreeShapeEncodingHelper(originNode, destNode int, 
 	return nil
 }
 
+// GetSubTreeShapeEncoding returns the shape encoding for the subtree rooted at the given node.
+// A shape encoding is a bitmap which reflects the structure of the subtree.
 func (tree *BinaryTree) GetSubTreeShapeEncoding(node int) uint64 {
 	var shape uint64
 	err := tree.getSubTreeShapeEncodingHelper(node, 0, &shape)
@@ -220,34 +156,34 @@ func (tree *BinaryTree) GetSubTreeShapeEncoding(node int) uint64 {
 	return shape
 }
 
+// buildSmallestTwinTreeHelper is the recursive helper function for BuildSmallestTwinTree()
 func (tree *BinaryTree) buildSmallestTwinTreeHelper(twinTree *BinaryTree, structureTree BinaryTree, node int, minValue uint64) uint64 {
+	// leafCount represents the number of leaves below the current node (thus the number of prime factors of this node in the tree)
 	leafCount := structureTree.GetNode(node)
 	if leafCount == 0 {
+		// Should never reach this
 		return 0
 	}
 
+	// if this node has only one prime factor, then it is itself prime and we can look for its value in the precomputed PRIME_SET
 	if leafCount == 1 {
-		var minPrime uint64
-		if _, ok := PRIME_SET[minValue]; ok {
-			minPrime = minValue
-		} else {
-			for _, minPrime = range PRIME_SLICE {
-				if minPrime >= minValue {
-					break
-				}
-			}
+		if _, ok := PRIME_SET[minValue]; !ok {
+			fmt.Printf("Provided minValue is not a valid prime: %d\n", minValue)
 		}
-		twinTree.Values[node] = minPrime
-		return minPrime
+		twinTree.Values[node] = minValue
+		return minValue
 	}
 
+	// minValue must be at least 2 ^ (#factors)
 	minPow2 := uint64(math.Pow(2, float64(leafCount)))
 	if minValue < minPow2 {
 		minValue = minPow2
 	}
 
+	// determine the bitmap for the original tree
 	targetEncoding := tree.GetSubTreeShapeEncoding(node)
 	if len(KNOWN_VALUES[targetEncoding]) != 0 {
+		// if known values exist for this shape, grab the lowest which is greater than minValue
 		var bestValue uint64 = 0
 		for _, val := range KNOWN_VALUES[targetEncoding] {
 			if val >= minValue {
@@ -255,6 +191,7 @@ func (tree *BinaryTree) buildSmallestTwinTreeHelper(twinTree *BinaryTree, struct
 				break
 			}
 		}
+		// take the bestValue and fill out the tree with it
 		if bestValue > 0 {
 			T(primeFactorize(bestValue), twinTree, node)
 			return bestValue
@@ -262,125 +199,58 @@ func (tree *BinaryTree) buildSmallestTwinTreeHelper(twinTree *BinaryTree, struct
 	}
 
 	var l, r uint64
-	var nodeVal uint64
-	var minL uint64 = uint64(0.75 * math.Sqrt(float64(minValue)))
+	var candidateNodeValue uint64
 	var maxL uint64 = math.MaxUint64
-	var minR uint64 = minL
 	var bestValue, bestL, bestR uint64 = math.MaxUint64, 0, 0
-	for nodeVal == 0 || l < maxL {
-		if l >= 900_000 {
-			print()
-		}
+	var minL uint64 = uint64(0.75 * math.Sqrt(float64(minValue))) // could theoretically miss optimal choice, but unlikely.
+
+	// Loop until we find a candidate value, then continue until we're sure there's no better candidate
+	for candidateNodeValue == 0 || l < maxL {
 		l = tree.buildSmallestTwinTreeHelper(twinTree, structureTree, node*2+1, minL)
-		minR = l
+
+		// r can be no less than max(l, minValue/l)
+		var minR uint64 = l
 		if minR*l < minValue {
 			minR = uint64(math.Ceil(float64(minValue) / float64(l)))
 		}
 		r = tree.buildSmallestTwinTreeHelper(twinTree, structureTree, node*2+2, minR)
 
+		// step forward minL for the next try (if required)
 		minL = l + 1
+
+		// check that the proposed tree has the correct shape
 		var testTree BinaryTree
 		factors := append(primeFactorize(l), primeFactorize(r)...)
 		T(factors, &testTree, 0)
 		if targetEncoding == testTree.GetSubTreeShapeEncoding(0) {
 			if maxL > r {
+				// once we have a good candidate, stop looking when maxL reaches the lowest valid value of r which has given us a candidate
 				maxL = r
 			}
-			nodeVal = l * r
-			if nodeVal < bestValue {
-				bestValue = nodeVal
+			candidateNodeValue = l * r
+			if candidateNodeValue < bestValue {
+				// we're looking for minimal candidate
+				bestValue = candidateNodeValue
 				bestL = l
 				bestR = r
 			}
 		}
 	}
 
-	l = tree.buildSmallestTwinTreeHelper(twinTree, structureTree, node*2+1, bestL)
-	r = tree.buildSmallestTwinTreeHelper(twinTree, structureTree, node*2+2, bestR)
+	// check if optimal subtrees have been overwritten and repopulate
+	if tree.GetNode(node*2+1) != bestL {
+		l = tree.buildSmallestTwinTreeHelper(twinTree, structureTree, node*2+1, bestL)
+	}
+	if tree.GetNode(node*2+2) != bestR {
+		r = tree.buildSmallestTwinTreeHelper(twinTree, structureTree, node*2+2, bestR)
+	}
+
+	// set node to correct value
 	twinTree.SetNode(node, bestValue)
 	return bestValue
-
-	// var leftEncoding = tree.GetSubTreeShapeEncoding(tree.LeftChild(node))
-	// var rightEncoding = tree.GetSubTreeShapeEncoding(tree.RightChild(node))
-
-	// var target uint64
-	// var currentMin uint64 = math.MaxUint32
-	// var bestR uint64 = math.MaxUint32
-	// lCache, rCache := make(map[uint64]uint64), make(map[uint64]uint64)
-	// for target = minValue; target <= currentMin; target++ {
-	// 	if _, ok := PRIME_SET[target]; ok {
-	// 		continue
-	// 	}
-	// 	if target < uint64(MAX_PRECOMP_TREE) && targetEncoding != KNOWN_TREES[target] {
-	// 		continue
-	// 	}
-
-	// 	factors := primeFactorize(target)
-	// 	if len(factors) != int(leafCount) {
-	// 		continue
-	// 	}
-	// 	if target < uint64(MAX_PRECOMP_TREE) {
-	// 		T(factors, twinTree, node)
-	// 		return target
-	// 	}
-
-	// 	left, right := partition(factors)
-	// 	if uint64(len(left)) != lLeaf {
-	// 		continue
-	// 	}
-	// 	l, r := prod(left), prod(right)
-	// 	if l > bestR {
-	// 		bestR = math.MaxUint64
-	// 	} else if r > bestR {
-	// 		continue
-	// 	}
-
-	// 	var actualL uint64
-	// 	if cachedL, ok := lCache[l]; ok {
-	// 		actualL = cachedL
-	// 	} else {
-	// 		subTree := tree.GetSubTree(node*2 + 1)
-	// 		actualL = subTree.buildSmallestTwinTreeHelper(&subTree, subTree.GetStructureTree(), 0, l)
-	// 		for i := l; i <= actualL; i++ {
-	// 			if _, ok := lCache[i]; ok {
-	// 				break
-	// 			}
-	// 			lCache[i] = actualL
-	// 		}
-	// 	}
-
-	// 	if actualL != l {
-	// 		continue
-	// 	}
-
-	// 	var actualR uint64
-	// 	if cachedR, ok := rCache[r]; ok {
-	// 		actualR = cachedR
-	// 	} else {
-	// 		subTree := tree.GetSubTree(node*2 + 2)
-	// 		actualR = subTree.buildSmallestTwinTreeHelper(&subTree, subTree.GetStructureTree(), 0, r)
-	// 		for i := r; i <= actualR; i++ {
-	// 			rCache[i] = actualR
-	// 		}
-	// 		if actualR < bestR {
-	// 			bestR = actualR
-	// 		}
-	// 	}
-
-	// 	if actualR != r {
-	// 		continue
-	// 	}
-
-	// 	tree.buildSmallestTwinTreeHelper(twinTree, structureTree, node*2+1, actualL)
-	// 	tree.buildSmallestTwinTreeHelper(twinTree, structureTree, node*2+2, actualR)
-	// 	twinTree.SetNode(node, target)
-	// 	return target
-
-	// }
-
-	return 0
 }
 
+// BuildSmallestTwinTree recursively searches for the tree with the same shape as the original with minimal value.
 func (tree *BinaryTree) BuildSmallestTwinTree() BinaryTree {
 	result := BinaryTree{Values: make([]uint64, len(tree.Values))}
 	tree.buildSmallestTwinTreeHelper(&result, tree.GetStructureTree(), 0, 2)
@@ -425,6 +295,7 @@ func powerSet(numbers []uint64, r int) [][]uint64 {
 	return results
 }
 
+// primeFactorize returns the prime factors of n
 func primeFactorize(n uint64) []uint64 {
 	var factors []uint64
 	for _, p := range PRIME_SLICE {
@@ -446,7 +317,7 @@ func primeFactorize(n uint64) []uint64 {
 	return factors
 }
 
-// primeFactorizeFactorial returns the concatenated prime factors of n!! sorted
+// primeFactorizeFactorial returns the prime factors of n!! as a sorted slice
 func primeFactorizeFactorial(n uint64) []uint64 {
 	var primeFactors []uint64
 
@@ -544,6 +415,7 @@ func partition(factors []uint64) ([]uint64, []uint64) {
 	return part1, part2
 }
 
+// T builds the binary tree of factors where each pair of children is as close as possible
 func T(factors []uint64, tree *BinaryTree, nodeId int) {
 	if tree == nil {
 		panic("Tree is nil")
@@ -560,23 +432,17 @@ func T(factors []uint64, tree *BinaryTree, nodeId int) {
 	T(right, tree, nodeId*2+2)
 }
 
+// M returns the smallest number that has a factor tree identical in shape to the factor tree for n!!
 func M(min, max, step int) uint64 {
-
 	var sum uint64
-	// i := n
 	for i := min; i <= max; i += step {
-		// fmt.Println(i)
-
-		T(primeFactorize(SOLVE[i]), &SOLVE_TREE, 0)
 		baseFactors := primeFactorizeFactorial(uint64(i))
 		tree := &BinaryTree{}
 		T(baseFactors, tree, 0)
 
-		// structureTree := tree.GetStructureTree()
 		twinTree := tree.BuildSmallestTwinTree()
-		fmt.Println(strings.Join(strings.Fields(fmt.Sprint(tree.Values)), ","))
-		// fmt.Println(strings.Join(strings.Fields(fmt.Sprint(structureTree.Values)), ","))
-		fmt.Println(strings.Join(strings.Fields(fmt.Sprint(twinTree.Values)), ","))
+		// fmt.Println(strings.Join(strings.Fields(fmt.Sprint(tree.Values)), ","))
+		// fmt.Println(strings.Join(strings.Fields(fmt.Sprint(twinTree.Values)), ","))
 		var bonus string
 		if i < len(SOLVE) && twinTree.GetNode(0) != SOLVE[i] {
 			bonus = " (WRONG)"
@@ -584,56 +450,12 @@ func M(min, max, step int) uint64 {
 		fmt.Printf("M(%d) = %d%s\n", i, twinTree.GetNode(0), bonus)
 		sum += twinTree.GetNode(0)
 	}
-	return uint64(sum)
+	return sum
 }
 
 func main() {
-	cpuProfile := flag.String("cpuprofile", "", "write cpu profile to file")
-	flag.Parse()
-
 	PRIME_SET, PRIME_SLICE = loadPrimes()
 	precomputeTrees()
 
-	solve := func() {
-		M(2, 31, 1)
-	}
-
-	if *cpuProfile != "" {
-		f, err := os.Create(*cpuProfile)
-		if err != nil {
-			panic(err)
-		}
-		if err := pprof.StartCPUProfile(f); err != nil {
-			panic(err)
-		}
-		solve()
-		pprof.StopCPUProfile()
-		if err := f.Close(); err != nil {
-			panic(err)
-		}
-		return
-	}
-
-	// tree := &BinaryTree{}
-	// // // T(primeFactorizeFactorial(21), tree, 0)
-	// T(primeFactorize(SOLVE[19]), tree, 0)
-	// fmt.Println(strings.Join(strings.Fields(fmt.Sprint(tree.Values)), ","))
-
-	solve()
-
-	// structureTree := tree.GetStructureTree()
-	// twinTree := tree.BuildSmallestTwinTree()
-	// // subTree := tree.GetSubTree(2)
-	// // tree.InsertSubTree(1, subTree)
-	// fmt.Println(strings.Join(strings.Fields(fmt.Sprint(structureTree.Values)), ","))
-	// fmt.Println(strings.Join(strings.Fields(fmt.Sprint(twinTree.Values)), ","))
-	// fmt.Println(strings.Join(strings.Fields(fmt.Sprint(subTree.Values)), ","))
-
-	// print(strings.Join(strings.Fields(fmt.Sprint(primeFactorize(783))), ","))
-	// p1, p2 := partition(primeFactorize(992))
-	// print(strings.Join(strings.Fields(fmt.Sprint(p1)), ","))
-	// print(strings.Join(strings.Fields(fmt.Sprint(p2)), ","))
-	// numbers := []uint64{1, 1, 2, 3}
-	// r := 3
-	// fmt.Println(len(powerSet(numbers, r)))
+	fmt.Printf("Solution: %d\n", M(2, 31, 1))
 }
