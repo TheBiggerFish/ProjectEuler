@@ -32,7 +32,7 @@ var SOLVE = []uint64{0, 0, 2, 2, 8, 4, 32, 8, 256, 72, 3456, 540, 20480, 1800, 2
 var KNOWN_VALUES = make(map[uint64][]uint64)
 
 // Loads precomputed primes from a binary file
-func loadPrimes() (map[uint64]struct{}, []uint64) {
+func loadPrimes(primeMax uint64) (map[uint64]struct{}, []uint64) {
 	// Try reading a precomputed primes file written by `writePrimesToFile`.
 	f, err := os.Open("Problem829/primes.bin")
 	if err == nil {
@@ -49,8 +49,8 @@ func loadPrimes() (map[uint64]struct{}, []uint64) {
 					break
 				}
 				primes = append(primes, uint64(p))
-				if PRIME_MAX > 0 && uint64(p) >= PRIME_MAX {
-					PRIME_MAX = uint64(p)
+				if primeMax > 0 && uint64(p) >= primeMax {
+					primeMax = uint64(p)
 					break
 				}
 			}
@@ -68,8 +68,9 @@ func loadPrimes() (map[uint64]struct{}, []uint64) {
 }
 
 // precomputeTrees generates KNOWN_VALUES for composite numbers up to a value of MAX_PRECOMP_TREE
-func precomputeTrees() {
-	for i := 2; i < MAX_PRECOMP_TREE; i++ {
+func precomputeTrees(maxPrecompTree int) map[uint64][]uint64 {
+	knownValues := make(map[uint64][]uint64)
+	for i := 2; i < maxPrecompTree; i++ {
 		if _, ok := PRIME_SET[uint64(i)]; ok {
 			continue
 		}
@@ -78,9 +79,10 @@ func precomputeTrees() {
 		T(factors, tree, 0)
 		encoding := tree.GetSubTreeShapeEncoding(0)
 		if encoding != 0 {
-			KNOWN_VALUES[encoding] = append(KNOWN_VALUES[encoding], uint64(i))
+			knownValues[encoding] = append(knownValues[encoding], uint64(i))
 		}
 	}
+	return knownValues
 }
 
 // BinaryTree is a simple heap-indexed binary tree. Nodes are stored in
@@ -454,8 +456,8 @@ func M(min, max, step int) uint64 {
 }
 
 func main() {
-	PRIME_SET, PRIME_SLICE = loadPrimes()
-	precomputeTrees()
+	PRIME_SET, PRIME_SLICE = loadPrimes(PRIME_MAX)
+	KNOWN_VALUES = precomputeTrees(MAX_PRECOMP_TREE)
 
 	fmt.Printf("Solution: %d\n", M(2, 31, 1))
 }
